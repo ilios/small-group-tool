@@ -1,5 +1,12 @@
 /* eslint-env node */
 'use strict';
+const existsSync = require('exists-sync');
+const dotenv = require('dotenv');
+const path = require('path');
+const dotEnvPath = path.join(__dirname, '../.env');
+if (existsSync(dotEnvPath)) {
+  dotenv.config({ path: dotEnvPath });
+}
 
 module.exports = function(environment) {
   let ENV = {
@@ -7,6 +14,15 @@ module.exports = function(environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
+    apiHost: process.env.ILIOS_SMALL_GROUP_TOOL_API_HOST || null,
+    'ember-simple-auth-token': {
+      serverTokenEndpoint: '/auth/login',
+      serverTokenRefreshEndpoint: '/auth/token',
+      tokenPropertyName: 'jwt',
+      authorizationHeaderName: 'X-JWT-Authorization',
+      authorizationPrefix: 'Token ',
+      refreshLeeway: 300
+    },
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

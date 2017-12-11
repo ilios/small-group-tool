@@ -21,7 +21,7 @@ export default Controller.extend({
         });
         if (response.ok) {
           const obj = await response.json();
-          const authenticator = 'authenticator:jwt';
+          const authenticator = 'authenticator:ilios-jwt';
           this.get('session').authenticate(authenticator, {jwt: obj.jwt});
         }
       }

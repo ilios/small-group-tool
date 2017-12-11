@@ -23,6 +23,14 @@ module.exports = function(environment) {
       authorizationPrefix: 'Token ',
       refreshLeeway: 300
     },
+    serverVariables: {
+      tagPrefix: 'iliosconfig',
+      vars: ['api-host', 'api-name-space'],
+      defaults: {
+        'api-name-space': process.env.ILIOS_SMALL_GROUP_TOOL_API_NAMESPACE || 'api/v1',
+        'api-host': process.env.ILIOS_SMALL_GROUP_TOOL_API_HOST || null,
+      }
+    },
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

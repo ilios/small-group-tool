@@ -371,7 +371,7 @@ babel-core@^5.0.0:
     trim-right "^1.0.0"
     try-resolve "^1.0.0"
 
-babel-core@^6.14.0, babel-core@^6.26.0:
+babel-core@^6.14.0, babel-core@^6.24.1, babel-core@^6.26.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-core/-/babel-core-6.26.0.tgz#af32f78b31a6fcef119c87b0fd8d9753f03a0bb8"
   dependencies:
@@ -2544,6 +2544,15 @@ ember-concurrency@0.7.19:
     ember-getowner-polyfill "^1.1.0"
     ember-maybe-import-regenerator "^0.1.4"
 
+ember-concurrency@^0.8.12:
+  version "0.8.12"
+  resolved "https://registry.yarnpkg.com/ember-concurrency/-/ember-concurrency-0.8.12.tgz#fb91180e5efeb1024cfa2cfb99d2fe6721930c91"
+  dependencies:
+    babel-core "^6.24.1"
+    ember-cli-babel "^6.8.2"
+    ember-getowner-polyfill "^2.0.0"
+    ember-maybe-import-regenerator "^0.1.5"
+
 ember-cookies@^0.0.13:
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/ember-cookies/-/ember-cookies-0.0.13.tgz#18350df766240793d46744e4ee5c9a55ae6b4e0a"
@@ -2626,7 +2635,7 @@ ember-getowner-polyfill@^1.1.0, ember-getowner-polyfill@^1.2.2:
     ember-cli-version-checker "^1.2.0"
     ember-factory-for-polyfill "^1.1.0"
 
-ember-getowner-polyfill@^2.0.1:
+ember-getowner-polyfill@^2.0.0, ember-getowner-polyfill@^2.0.1:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ember-getowner-polyfill/-/ember-getowner-polyfill-2.2.0.tgz#38e7dccbcac69d5ec694000329ec0b2be651d2b2"
   dependencies:
@@ -2683,7 +2692,7 @@ ember-macro-helpers@^0.17.0:
     ember-cli-test-info "^1.0.0"
     ember-weakmap "^3.0.0"
 
-ember-maybe-import-regenerator@^0.1.4, ember-maybe-import-regenerator@^0.1.6:
+ember-maybe-import-regenerator@^0.1.4, ember-maybe-import-regenerator@^0.1.5, ember-maybe-import-regenerator@^0.1.6:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/ember-maybe-import-regenerator/-/ember-maybe-import-regenerator-0.1.6.tgz#35d41828afa6d6a59bc0da3ce47f34c573d776ca"
   dependencies:
@@ -2708,6 +2717,15 @@ ember-one-way-controls@^3.0.0, ember-one-way-controls@^3.0.1:
     ember-cli-htmlbars "^2.0.1"
     ember-invoke-action "^1.5.0"
     ember-runtime-enumerable-includes-polyfill "^2.0.0"
+
+ember-papaparse@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ember-papaparse/-/ember-papaparse-1.0.0.tgz#7116ad3392f0f3179e4b062341b88cb86092ca44"
+  dependencies:
+    broccoli-funnel "^2.0.1"
+    broccoli-merge-trees "^2.0.0"
+    ember-cli-babel "^6.6.0"
+    papaparse "^4.3.6"
 
 ember-promise-helpers@^1.0.3:
   version "1.0.3"
@@ -5370,6 +5388,10 @@ p-locate@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-locate/-/p-locate-2.0.0.tgz#20a0103b222a70c8fd39cc2e580680f3dde5ec43"
   dependencies:
     p-limit "^1.1.0"
+
+papaparse@^4.3.6:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.3.6.tgz#9566eda0ecab13afcb740a62381c699f486cb145"
 
 parse-glob@^3.0.4:
   version "3.0.4"

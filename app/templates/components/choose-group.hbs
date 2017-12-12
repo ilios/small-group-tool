@@ -1,0 +1,60 @@
+<h2>Select Learner Group</h2>
+
+{{#if group}}
+  {{group.title}} <button {{action 'unsetGroup'}}>Pick a different group</button>
+{{else}}
+  <div class='filters'>
+    <div>
+      <label for='school-filter'>School</label>
+      <select onchange={{action 'changeSchoolId' value="target.value"}} id='school-filter'>
+        {{#each (sort-by 'title' (await user.schools)) as |school|}}
+          <option value={{school.id}} selected={{is-equal school (await selectedSchool)}}>
+            {{school.title}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div>
+      <label for='program-filter'>Program</label>
+      <select onchange={{action 'changeProgramId' value="target.value"}} id='program-filter'>
+        {{#each (sort-by 'title' (await programs)) as |program|}}
+          <option value={{program.id}} selected={{is-equal program (await selectedProgram)}}>
+            {{program.title}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div>
+      <label for='program-year-filter'>Cohort</label>
+      <select onchange={{action 'changeProgramYearId' value="target.value"}} id='program-year-filter'>
+        {{#each (sort-by 'title' (await programYears)) as |programYear|}}
+          <option value={{programYear.id}} selected={{is-equal programYear (await selectedProgramYear)}}>
+            {{programYear.cohort.title}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class='groups'>
+      <label for='learner-group-chooser'>Learner Groups</label>
+      <select onchange={{action (mut groupId) value="target.value"}} id='learner-group-chooser'>
+        {{#each (sort-by 'title' (await learnerGroups)) as |learnerGroup|}}
+          <option value={{learnerGroup.id}} selected={{is-equal learnerGroup (await selectedGroup)}}>
+            {{learnerGroup.title}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <strong>Group Name: </strong> {{get (await selectedGroup) 'title'}} <br />
+    <strong>Members: </strong> {{get (await selectedGroup) 'users.length'}} <br />
+    <button {{action 'setGroup'}}>Select Group</button>
+  </div>
+{{/if}}
+
+
+

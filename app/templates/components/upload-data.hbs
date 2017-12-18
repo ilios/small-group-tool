@@ -26,7 +26,7 @@
     </tbody>
   </table>
 
-  <button {{action sendValidUsers validUsers}} data-test-upload-data-send>Next</button>
+  <button {{action sendValidUsers validUsers}} data-test-upload-data-confirm>Confirm</button>
 {{else}}
   <label for='user-file'>Users</label>
   <input id='user-file' type='file' onchange={{action 'updateSelectedFile' value="target.files"}} data-test-user-upload>

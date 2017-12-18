@@ -22,4 +22,5 @@ export default function() {
   this.get('cohorts');
   this.get('programyears', 'programYear');
   this.get('learnergroups', 'learnerGroup');
+  this.get('learnergroups/:id', 'learnerGroup');
 }

@@ -182,3 +182,30 @@ test('upload user errors', async function (assert) {
   assert.ok(page.uploadedUsers(4).isInvalid);
   assert.equal(page.uploadedUsers(4).errors, 'Could not find a user with the campusId abcd');
 });
+
+test('choose small group match', async function (assert) {
+  await page.visit();
+  await page.pickLearnerGroup('group 1');
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+  server.create('user', {
+    firstName: 'jasper',
+    lastName: 'johnson',
+    campusId: '1234567890'
+  });
+  let users = [
+    ['jasper', 'johnson', '1234567890', '123Test'],
+    ['jackson', 'johnson', '12345', '123Test'],
+  ];
+  await triggerUpload(users, input);
+  assert.equal(page.uploadedUsers().count, 2);
+  await page.confirmUploadedUsers();
+  assert.equal(page.groupsToMatch().count, 1);
+  await page.groupsToMatch(0).chooseGroup('group 1 child 1');
+
+  assert.equal(page.finalData().count, 1);
+  assert.equal(page.finalData(0).firstName, 'jasper');
+  assert.equal(page.finalData(0).lastName, 'johnson');
+  assert.equal(page.finalData(0).campusId, '1234567890');
+  assert.equal(page.finalData(0).smallGroupName, 'group 1 child 1');
+});

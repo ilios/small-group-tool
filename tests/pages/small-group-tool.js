@@ -57,5 +57,24 @@ export default create({
       smallGroupName: text('td', { at: 3 }),
       errors: text('td', { at: 4 }),
     }
-  })
+  }),
+  confirmUploadedUsers: clickable('[data-test-upload-data-confirm]'),
+
+  groupsToMatch: collection({
+    itemScope: '[data-test-match-groups-unmatched] li',
+    item: {
+      name: text('label'),
+      chooseGroup: selectable('select'),
+    }
+  }),
+
+  finalData: collection({
+    itemScope: '[data-test-final-data] tbody tr',
+    item: {
+      firstName: text('td', { at: 0 }),
+      lastName: text('td', { at: 1 }),
+      campusId: text('td', { at: 2 }),
+      smallGroupName: text('td', { at: 3 }),
+    }
+  }),
 });

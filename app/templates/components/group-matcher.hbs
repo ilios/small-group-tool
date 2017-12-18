@@ -1,0 +1,9 @@
+<label for='sub-group-{{elementId}}'>{{groupName}}</label>
+<select onchange={{action 'matchGroup' value="target.value"}} id='sub-group-{{elementId}}'>
+  <option value='null' selected={{is-equal matchedGroupId null}}>Choose a Group</option>
+  {{#each groups as |learnerGroup|}}
+    <option value={{learnerGroup.id}} selected={{is-equal learnerGroup.id matchedGroupId}}>
+      {{learnerGroup.title}}
+    </option>
+  {{/each}}
+</select>

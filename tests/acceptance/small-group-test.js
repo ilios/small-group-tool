@@ -83,3 +83,102 @@ test('viewing small group', async function (assert) {
 
   await page.selectCurrentGroup();
 });
+
+let createFile = function(users){
+  let file;
+  let lines = users.map(arr => {
+    return arr.join("\t");
+  });
+
+  let contents = lines.join("\n");
+  file = new Blob([contents], { type: 'text/plain' });
+
+  file.mime = 'text/plain';
+  file.name = 'test.txt';
+  return file;
+};
+
+let triggerUpload = async function(users, inputElement){
+  let file = createFile(users);
+  inputElement.triggerHandler({
+    type: 'change',
+    target: {
+      files: {
+        0: file,
+        length: 1,
+        item() { return file; }
+      }
+    }
+  });
+  await wait();
+};
+
+test('upload users', async function (assert) {
+  await page.visit();
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+  server.create('user', {
+    firstName: 'jasper',
+    lastName: 'johnson',
+    campusId: '1234567890'
+  });
+  server.create('user', {
+    firstName: 'jackson',
+    lastName: 'johnson',
+    campusId: '12345'
+  });
+  let users = [
+    ['jasper', 'johnson', '1234567890', '123Test'],
+    ['jackson', 'johnson', '12345'],
+  ];
+  await triggerUpload(users, input);
+  assert.equal(page.uploadedUsers().count, 2);
+  assert.notOk(page.uploadedUsers(0).isInvalid);
+  assert.equal(page.uploadedUsers(0).firstName, 'jasper');
+  assert.equal(page.uploadedUsers(0).lastName, 'johnson');
+  assert.equal(page.uploadedUsers(0).campusId, '1234567890');
+  assert.equal(page.uploadedUsers(0).smallGroupName, '123Test');
+  assert.equal(page.uploadedUsers(0).errors, '');
+  assert.notOk(page.uploadedUsers(1).isInvalid);
+  assert.equal(page.uploadedUsers(1).firstName, 'jackson');
+  assert.equal(page.uploadedUsers(1).lastName, 'johnson');
+  assert.equal(page.uploadedUsers(1).campusId, '12345');
+  assert.equal(page.uploadedUsers(1).smallGroupName, '');
+  assert.equal(page.uploadedUsers(1).errors, '');
+});
+
+test('upload user errors', async function (assert) {
+  await page.visit();
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+  server.create('user', {
+    firstName: 'jasper',
+    lastName: 'johnson',
+    campusId: '1234567890'
+  });
+  server.create('user', {
+    firstName: 'jackson',
+    lastName: 'johnson',
+    campusId: '12345'
+  });
+  let users = [
+    ['j', 'johnson', '1234567890', '123Test'],
+    ['jackson', 'j', '12345'],
+    ['', 'johnson', '12345', '123Test'],
+    ['Magick', '', '12345'],
+    ['Missing', 'Person', 'abcd'],
+  ];
+  await triggerUpload(users, input);
+
+  assert.equal(page.uploadedUsers().count, 5);
+  assert.ok(page.uploadedUsers(0).isInvalid);
+  assert.equal(page.uploadedUsers(0).errors, 'First Name does not match user record: jasper');
+  assert.ok(page.uploadedUsers(1).isInvalid);
+  assert.equal(page.uploadedUsers(1).errors, 'Last Name does not match user record: johnson');
+  assert.ok(page.uploadedUsers(2).isInvalid);
+  assert.equal(page.uploadedUsers(2).errors, 'First Name is required');
+  assert.ok(page.uploadedUsers(3).isInvalid);
+  assert.equal(page.uploadedUsers(3).errors, 'Last Name is required');
+  assert.ok(page.uploadedUsers(4).isInvalid);
+  assert.equal(page.uploadedUsers(4).errors, 'Could not find a user with the campusId abcd');
+});

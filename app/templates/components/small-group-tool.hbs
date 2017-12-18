@@ -1,1 +1,5 @@
 {{choose-group user=user setGroup=(action (mut group)) group=group}}
+
+{{#if group}}
+  {{upload-data sendValidUsers=(action (mut validUsers))}}
+{{/if}}

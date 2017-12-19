@@ -1,4 +1,5 @@
 @import 'ilios-common/styles';
+@import 'small-group-tool';
 
 header {
   background-color: $ilios-orange;
@@ -14,6 +15,9 @@ header {
   a {
     cursor: pointer;
   }
-
 }
-@import 'small-group-tool';
+
+.login-form {
+  margin: 1em auto;
+  text-align: center;
+}

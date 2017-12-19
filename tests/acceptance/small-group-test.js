@@ -120,31 +120,31 @@ test('upload users', async function (assert) {
   server.create('user', {
     firstName: 'jasper',
     lastName: 'johnson',
-    campusId: '1234567890'
+    campusId: '1234567890',
+    cohortIds: [1],
   });
   server.create('user', {
     firstName: 'jackson',
     lastName: 'johnson',
-    campusId: '12345'
+    campusId: '12345',
+    cohortIds: [1],
   });
   let users = [
     ['jasper', 'johnson', '1234567890', '123Test'],
     ['jackson', 'johnson', '12345'],
   ];
   await triggerUpload(users, input);
-  assert.equal(page.uploadedUsers().count, 2);
-  assert.notOk(page.uploadedUsers(0).isInvalid);
-  assert.equal(page.uploadedUsers(0).firstName, 'jasper');
-  assert.equal(page.uploadedUsers(0).lastName, 'johnson');
-  assert.equal(page.uploadedUsers(0).campusId, '1234567890');
-  assert.equal(page.uploadedUsers(0).smallGroupName, '123Test');
-  assert.equal(page.uploadedUsers(0).errors, '');
-  assert.notOk(page.uploadedUsers(1).isInvalid);
-  assert.equal(page.uploadedUsers(1).firstName, 'jackson');
-  assert.equal(page.uploadedUsers(1).lastName, 'johnson');
-  assert.equal(page.uploadedUsers(1).campusId, '12345');
-  assert.equal(page.uploadedUsers(1).smallGroupName, '');
-  assert.equal(page.uploadedUsers(1).errors, '');
+  assert.equal(page.validUploadedUsers().count, 2);
+  assert.equal(page.validUploadedUsers(0).firstName, 'jasper');
+  assert.equal(page.validUploadedUsers(0).lastName, 'johnson');
+  assert.equal(page.validUploadedUsers(0).campusId, '1234567890');
+  assert.equal(page.validUploadedUsers(0).smallGroupName, '123Test');
+  assert.equal(page.validUploadedUsers(1).firstName, 'jackson');
+  assert.equal(page.validUploadedUsers(1).lastName, 'johnson');
+  assert.equal(page.validUploadedUsers(1).campusId, '12345');
+  assert.equal(page.validUploadedUsers(1).smallGroupName, '');
+
+  assert.ok(page.showConfirmUploadButton);
 });
 
 test('upload user errors', async function (assert) {
@@ -154,12 +154,19 @@ test('upload user errors', async function (assert) {
   server.create('user', {
     firstName: 'jasper',
     lastName: 'johnson',
-    campusId: '1234567890'
+    campusId: '1234567890',
+    cohortIds: [1],
   });
   server.create('user', {
     firstName: 'jackson',
     lastName: 'johnson',
-    campusId: '12345'
+    campusId: '12345',
+    cohortIds: [1],
+  });
+  server.create('user', {
+    firstName: 'mrs',
+    lastName: 'maisel',
+    campusId: '123456',
   });
   let users = [
     ['j', 'johnson', '1234567890', '123Test'],
@@ -167,20 +174,18 @@ test('upload user errors', async function (assert) {
     ['', 'johnson', '12345', '123Test'],
     ['Magick', '', '12345'],
     ['Missing', 'Person', 'abcd'],
+    ['mrs', 'maisel', '123456'],
   ];
   await triggerUpload(users, input);
 
-  assert.equal(page.uploadedUsers().count, 5);
-  assert.ok(page.uploadedUsers(0).isInvalid);
-  assert.equal(page.uploadedUsers(0).errors, 'First Name does not match user record: jasper');
-  assert.ok(page.uploadedUsers(1).isInvalid);
-  assert.equal(page.uploadedUsers(1).errors, 'Last Name does not match user record: johnson');
-  assert.ok(page.uploadedUsers(2).isInvalid);
-  assert.equal(page.uploadedUsers(2).errors, 'First Name is required');
-  assert.ok(page.uploadedUsers(3).isInvalid);
-  assert.equal(page.uploadedUsers(3).errors, 'Last Name is required');
-  assert.ok(page.uploadedUsers(4).isInvalid);
-  assert.equal(page.uploadedUsers(4).errors, 'Could not find a user with the campusId abcd');
+  assert.equal(page.invalidUploadedUsers().count, 6);
+  assert.equal(page.invalidUploadedUsers(0).errors, 'First Name does not match user record: jasper');
+  assert.equal(page.invalidUploadedUsers(1).errors, 'Last Name does not match user record: johnson');
+  assert.equal(page.invalidUploadedUsers(2).errors, 'First Name is required');
+  assert.equal(page.invalidUploadedUsers(3).errors, 'Last Name is required');
+  assert.equal(page.invalidUploadedUsers(4).errors, 'Could not find a user with the campusId abcd');
+  assert.equal(page.invalidUploadedUsers(5).errors, "User is not in this group's cohort: class of this year");
+  assert.notOk(page.showConfirmUploadButton);
 });
 
 test('choose small group match', async function (assert) {
@@ -191,21 +196,67 @@ test('choose small group match', async function (assert) {
   server.create('user', {
     firstName: 'jasper',
     lastName: 'johnson',
-    campusId: '1234567890'
+    campusId: '1234567890',
+    cohortIds: [1],
+  });
+  server.create('user', {
+    firstName: 'jackson',
+    lastName: 'johnson',
+    campusId: '12345',
+    cohortIds: [1],
   });
   let users = [
     ['jasper', 'johnson', '1234567890', '123Test'],
     ['jackson', 'johnson', '12345', '123Test'],
   ];
   await triggerUpload(users, input);
-  assert.equal(page.uploadedUsers().count, 2);
+  assert.equal(page.validUploadedUsers().count, 2);
+  await page.confirmUploadedUsers();
+  assert.equal(page.groupsToMatch().count, 1);
+  await page.groupsToMatch(0).chooseGroup('group 1 child 1');
+});
+
+test('finalize and save', async function (assert) {
+  assert.expect(4);
+  await page.visit();
+  await page.pickLearnerGroup('group 1');
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+  server.create('user', {
+    firstName: 'jasper',
+    lastName: 'johnson',
+    campusId: '1234567890',
+    cohortIds: [1],
+  });
+  server.create('user', {
+    firstName: 'jackson',
+    lastName: 'johnson',
+    campusId: '12345',
+    cohortIds: [1],
+  });
+  let users = [
+    ['jasper', 'johnson', '1234567890'],
+    ['jackson', 'johnson', '12345', '123Test'],
+  ];
+  await triggerUpload(users, input);
+  assert.equal(page.validUploadedUsers().count, 2);
   await page.confirmUploadedUsers();
   assert.equal(page.groupsToMatch().count, 1);
   await page.groupsToMatch(0).chooseGroup('group 1 child 1');
 
-  assert.equal(page.finalData().count, 1);
-  assert.equal(page.finalData(0).firstName, 'jasper');
-  assert.equal(page.finalData(0).lastName, 'johnson');
-  assert.equal(page.finalData(0).campusId, '1234567890');
-  assert.equal(page.finalData(0).smallGroupName, 'group 1 child 1');
+  server.put('learnergroups/:id', function (schema, request) {
+    const id = request.params.id;
+    const jsonData = this.serializerOrRegistry.normalize(JSON.parse(request.requestBody), 'learner-group');
+    switch (id) {
+    case '2':
+      assert.deepEqual(jsonData.data.attributes.users, ['2', '3']);
+      break;
+    case '4':
+      assert.deepEqual(jsonData.data.attributes.users, ['3']);
+      break;
+    default:
+      assert.ok(false, `Unexpected group #${id} saved.`);
+    }
+  });
+  await page.submitFinalData();
 });

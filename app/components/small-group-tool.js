@@ -30,26 +30,6 @@ export default Component.extend({
     return groupsStillNotMatched.length === 0;
   }),
 
-  finalData: computed('validUsers.[]', 'matchedGroups.[]', function () {
-    const validUsers = this.get('validUsers');
-    if (!validUsers) {
-      return [];
-    }
-    const matchedGroups = this.get('matchedGroups');
-    const group = this.get('group');
-    return validUsers.map(({ firstName, lastName, campusId, subGroupName }) => {
-      let groupTitle = group.get('title');
-      if (subGroupName) {
-        const match = matchedGroups.findBy('name', subGroupName);
-        if (match) {
-          groupTitle = match.get('groupTitle');
-        }
-      }
-
-      return { firstName, lastName, campusId, groupTitle };
-    });
-  }),
-
   init(){
     this._super(...arguments);
     this.set('matchedGroups', []);
@@ -62,13 +42,11 @@ export default Component.extend({
       const matchedGroups = this.get('matchedGroups').toArray();
       const match = matchedGroups.findBy('name', groupName);
       if (match) {
-        match.set('groupId', group.get('id'));
-        match.set('gropuTitle', group.get('title'));
+        match.set('group', group);
       } else {
         matchedGroups.pushObject(EmberObject.create({
           name: groupName,
-          groupId: group.get('id'),
-          groupTitle: group.get('title'),
+          group,
         }));
       }
 
@@ -83,5 +61,5 @@ export default Component.extend({
 
       this.set('matchedGroups', matchedGroups);
     }
-  }
+  },
 });

@@ -2,7 +2,7 @@ import {
   create,
   clickable,
   collection,
-  hasClass,
+  isVisible,
   property,
   text,
   visitable
@@ -47,10 +47,18 @@ export default create({
 
   selectCurrentGroup: clickable('[data-test-select-group]'),
 
-  uploadedUsers: collection({
-    itemScope: '[data-test-upload-data-users] tbody tr',
+  validUploadedUsers: collection({
+    itemScope: '[data-test-upload-data-valid-users] tbody tr',
     item: {
-      isInvalid: hasClass('invalid'),
+      firstName: text('td', { at: 0 }),
+      lastName: text('td', { at: 1 }),
+      campusId: text('td', { at: 2 }),
+      smallGroupName: text('td', { at: 3 }),
+    }
+  }),
+  invalidUploadedUsers: collection({
+    itemScope: '[data-test-upload-data-invalid-users] tbody tr',
+    item: {
       firstName: text('td', { at: 0 }),
       lastName: text('td', { at: 1 }),
       campusId: text('td', { at: 2 }),
@@ -58,6 +66,7 @@ export default create({
       errors: text('td', { at: 4 }),
     }
   }),
+  showConfirmUploadButton: isVisible('[data-test-upload-data-confirm]'),
   confirmUploadedUsers: clickable('[data-test-upload-data-confirm]'),
 
   groupsToMatch: collection({
@@ -77,4 +86,6 @@ export default create({
       smallGroupName: text('td', { at: 3 }),
     }
   }),
+
+  submitFinalData: clickable('[data-test-finalize-users-submit]'),
 });

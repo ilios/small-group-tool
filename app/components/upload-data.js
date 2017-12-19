@@ -12,6 +12,7 @@ export default Component.extend({
   classNames: ['upload-data'],
   file: null,
   data: null,
+  group: null,
 
   sampleData: computed(function(){
     const sampleUploadFields = ['First', 'Last', 'CampusID', 'Sub Group Name'];
@@ -25,6 +26,11 @@ export default Component.extend({
   validUsers: computed('data', function () {
     const data = this.get('data');
     return data.filterBy('isValid');
+  }),
+
+  invalidUsers: computed('data', function () {
+    const data = this.get('data');
+    return data.filter(obj => !obj.isValid);
   }),
 
   init(){
@@ -47,6 +53,8 @@ export default Component.extend({
 
   parseFile: task(function* (file) {
     const store = this.get('store');
+    const group = this.get('group');
+    const cohort = yield group.get('cohort');
     const proposedUsers = yield this.getFileContents(file);
     const data = yield map(proposedUsers, async ({firstName, lastName, campusId, subGroupName }) => {
       const errors = [];
@@ -59,7 +67,7 @@ export default Component.extend({
       if (isEmpty(campusId)) {
         errors.push('Campus ID is required');
       }
-      let userId = null;
+      let userRecord = null;
       if (errors.length === 0) {
         const users = await store.query('user', {
           filters: {
@@ -73,18 +81,23 @@ export default Component.extend({
           errors.push(`Multiple users found with the campusId ${campusId}`);
         } else {
           const user = users.get('firstObject');
+          const cohorts = await user.get('cohorts');
+          const cohortIds = cohorts.mapBy('id');
+          if (!cohortIds.includes(cohort.get('id'))) {
+            errors.push(`User is not in this group's cohort: ` + cohort.get('title'));
+          }
           if (user.get('firstName') != firstName) {
             errors.push(`First Name does not match user record: ` + user.get('firstName'));
           }
           if (user.get('lastName') != lastName) {
             errors.push(`Last Name does not match user record: ` + user.get('lastName'));
           }
-          userId = user.get('id');
+          userRecord = user;
         }
       }
 
       return {
-        firstName, lastName, campusId, subGroupName, userId,
+        firstName, lastName, campusId, subGroupName, userRecord,
         errors,
         isValid: errors.length === 0
       };

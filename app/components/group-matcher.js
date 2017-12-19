@@ -11,7 +11,7 @@ export default Component.extend({
     const groupName = this.get('groupName');
     const match = matches.findBy('name', groupName);
     if (match) {
-      return match.get('groupId');
+      return match.get('group.id');
     }
 
     return null;

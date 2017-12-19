@@ -1,6 +1,9 @@
-{{#if data}}
-  <h3>Users:</h3>
-  <table data-test-upload-data-users>
+<label for='user-file'>Upload CSV</label>
+<input id='user-file' type='file' onchange={{action 'updateSelectedFile' value="target.files"}} data-test-user-upload>
+
+{{#if validUsers}}
+  <h3>Valid Users:</h3>
+  <table class='invalid-users' data-test-upload-data-valid-users>
     <thead>
       <tr>
         <th>First Name</th>
@@ -10,7 +13,33 @@
       </tr>
     </thead>
     <tbody>
-      {{#each data as |user|}}
+      {{#each validUsers as |user|}}
+        <tr class={{unless user.isValid 'invalid'}}>
+          <td>{{user.firstName}}</td>
+          <td>{{user.lastName}}</td>
+          <td>{{user.campusId}}</td>
+          <td>{{user.subGroupName}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{/if}}
+
+{{#if invalidUsers}}
+  <h3>Invalid Users:</h3>
+  <p>Cannot continue with these invalid records, please fix and re-upload the file.</p>
+  <table class='invalid-users' data-test-upload-data-invalid-users>
+    <thead>
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Campus ID</th>
+        <th>Subgroup Name</th>
+        <th>Errors</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each invalidUsers as |user|}}
         <tr class={{unless user.isValid 'invalid'}}>
           <td>{{user.firstName}}</td>
           <td>{{user.lastName}}</td>
@@ -20,14 +49,16 @@
             {{#each user.errors as |error|}}
               {{error}}
             {{/each}}
+            {{#each user.warnings as |warning|}}
+              {{warning}}
+            {{/each}}
           </td>
         </tr>
       {{/each}}
     </tbody>
   </table>
+{{/if}}
 
-  <button {{action sendValidUsers validUsers}} data-test-upload-data-confirm>Confirm</button>
-{{else}}
-  <label for='user-file'>Users</label>
-  <input id='user-file' type='file' onchange={{action 'updateSelectedFile' value="target.files"}} data-test-user-upload>
+{{#if (and (eq invalidUsers.length 0) (gt validUsers.length 0))}}
+  <button {{action sendValidUsers validUsers}} data-test-upload-data-confirm>Continue with these records</button>
 {{/if}}

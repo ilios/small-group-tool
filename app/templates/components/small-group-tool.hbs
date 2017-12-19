@@ -1,32 +1,18 @@
 {{choose-group user=user setGroup=(action (mut group)) group=group}}
 
-{{#if (and group (not validUsers))}}
-  {{upload-data sendValidUsers=(action (mut validUsers))}}
+{{#if group}}
+  {{#if validUsers}}
+    {{validUsers.length}} users selected.
+    <button {{action (mut validUsers) null}}>Clear Uploaded Users</button>
+  {{else}}
+    {{upload-data group=group sendValidUsers=(action (mut validUsers))}}
+  {{/if}}
 {{/if}}
 
 {{#if (and group validUsers)}}
   {{match-groups addMatch=(action 'addMatch') removeMatch=(action 'removeMatch') matchedGroups=matchedGroups unmatchedGroups=unmatchedGroups group=group}}
 {{/if}}
 
-{{#if (and allUnmatchedGroupsMatched (gt finalData.length 0))}}
-  <table data-test-final-data>
-    <thead>
-      <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Campus ID</th>
-        <th>Add To Group</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each finalData as |obj|}}
-        <tr>
-          <td>{{obj.firstName}}</td>
-          <td>{{obj.lastName}}</td>
-          <td>{{obj.campusId}}</td>
-          <td>{{obj.groupTitle}}</td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
+{{#if (and allUnmatchedGroupsMatched (gt validUsers.length 0))}}
+  {{finalize-users users=validUsers matchedGroups=matchedGroups group=group}}
 {{/if}}

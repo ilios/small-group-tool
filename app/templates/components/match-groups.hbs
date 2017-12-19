@@ -2,7 +2,7 @@
   {{#if (eq (get (await allDescendantGroups) 'length') 0)}}
     {{group.title}} contains no subgroups. Please add the groups you want to use first.
   {{else}}
-    Unmatched Groups:
+    Match Groups:
     <ul data-test-match-groups-unmatched>
       {{#each unmatchedGroups as |name|}}
         {{group-matcher groupName=name setMatch=addMatch unsetMatch=removeMatch matches=matchedGroups groups=(sort-by 'title' (await allDescendantGroups))}}

@@ -1,4 +1,9 @@
-<label for='user-file'>Upload CSV</label>
+<label for='user-file'>
+  Upload CSV
+  (<a target='_blank' rel='noopener' download="SampleUserUpload.tsv" href='data:application/octet-stream;charset=utf-8;base64,{{sampleData}}'>
+    Sample File
+  </a>)
+  </label>
 <input id='user-file' type='file' onchange={{action 'updateSelectedFile' value="target.files"}} data-test-user-upload>
 
 {{#if validUsers}}

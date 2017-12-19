@@ -3,8 +3,8 @@ import { resolve } from 'rsvp';
 import startApp from '../helpers/start-app';
 import destroyApp from '../helpers/destroy-app';
 
-export default function(name, options = {}) {
-  module(name, {
+export default function(moduleName, options = {}) {
+  module(moduleName, {
     beforeEach() {
       this.application = startApp();
 

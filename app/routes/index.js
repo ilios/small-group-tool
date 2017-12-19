@@ -6,6 +6,7 @@ import { all } from 'rsvp';
 export default Route.extend(AuthenticatedRouteMixin, {
   store: service(),
   currentUser: service(),
+  session: service(),
   model(){
     const currentUser = this.get('currentUser');
     return currentUser.get('model');
@@ -18,5 +19,10 @@ export default Route.extend(AuthenticatedRouteMixin, {
       store.findAll('program-year'),
       store.findAll('cohort'),
     ]);
+  },
+  actions: {
+    invalidateSession() {
+      this.get('session').invalidate();
+    }
   }
 });

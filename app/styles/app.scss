@@ -1,1 +1,15 @@
 @import 'ilios-common/styles';
+
+header {
+  background-color: $ilios-orange;
+  color: $white;
+  padding: .5em;
+  text-align: center;
+  width: 100%;
+
+  h1 {
+    margin: 0;
+  }
+
+}
+@import 'small-group-tool';

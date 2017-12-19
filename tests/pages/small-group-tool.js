@@ -80,12 +80,21 @@ export default create({
   finalData: collection({
     itemScope: '[data-test-final-data] tbody tr',
     item: {
-      firstName: text('td', { at: 0 }),
-      lastName: text('td', { at: 1 }),
-      campusId: text('td', { at: 2 }),
-      smallGroupName: text('td', { at: 3 }),
+      name: text('td', { at: 0 }),
+      campusId: text('td', { at: 1 }),
+      groupName: text('td', { at: 2 }),
     }
   }),
 
+  finalErrorData: collection({
+    itemScope: '[data-test-final-error-data] tbody tr',
+    item: {
+      name: text('td', { at: 0 }),
+      campusId: text('td', { at: 1 }),
+      error: text('td', { at: 2 }),
+    }
+  }),
+
+  canSubmitFinalData: isVisible('[data-test-finalize-users-submit]'),
   submitFinalData: clickable('[data-test-finalize-users-submit]'),
 });

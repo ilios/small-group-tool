@@ -217,11 +217,7 @@ test('choose small group match', async function (assert) {
 });
 
 test('finalize and save', async function (assert) {
-  assert.expect(4);
-  await page.visit();
-  await page.pickLearnerGroup('group 1');
-  await page.selectCurrentGroup();
-  const input = await find('[data-test-user-upload]');
+  assert.expect(12);
   server.create('user', {
     firstName: 'jasper',
     lastName: 'johnson',
@@ -238,11 +234,24 @@ test('finalize and save', async function (assert) {
     ['jasper', 'johnson', '1234567890'],
     ['jackson', 'johnson', '12345', '123Test'],
   ];
+  await page.visit();
+  await page.pickLearnerGroup('group 1');
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+
   await triggerUpload(users, input);
   assert.equal(page.validUploadedUsers().count, 2);
   await page.confirmUploadedUsers();
   assert.equal(page.groupsToMatch().count, 1);
   await page.groupsToMatch(0).chooseGroup('group 1 child 1');
+
+  assert.equal(page.finalData().count, 2);
+  assert.equal(page.finalData(0).name, 'jasper johnson');
+  assert.equal(page.finalData(0).campusId, '1234567890');
+  assert.equal(page.finalData(0).groupName, 'group 1');
+  assert.equal(page.finalData(1).name, 'jackson johnson');
+  assert.equal(page.finalData(1).campusId, '12345');
+  assert.equal(page.finalData(1).groupName, 'group 1 child 1');
 
   server.put('learnergroups/:id', function (schema, request) {
     const id = request.params.id;
@@ -258,5 +267,51 @@ test('finalize and save', async function (assert) {
       assert.ok(false, `Unexpected group #${id} saved.`);
     }
   });
+  assert.ok(page.canSubmitFinalData);
   await page.submitFinalData();
+});
+
+test('catch user already in group and do not save', async function (assert) {
+  assert.expect(11);
+  server.create('user', {
+    firstName: 'jasper',
+    lastName: 'johnson',
+    campusId: '1234567890',
+    cohortIds: [1],
+    learnerGroupIds: [2],
+  });
+  server.create('user', {
+    firstName: 'jackson',
+    lastName: 'johnson',
+    campusId: '12345',
+    cohortIds: [1],
+    learnerGroupIds: [4],
+  });
+  let users = [
+    ['jasper', 'johnson', '1234567890'],
+    ['jackson', 'johnson', '12345', '123Test'],
+  ];
+  await page.visit();
+  await page.pickLearnerGroup('group 1');
+  await page.selectCurrentGroup();
+  const input = await find('[data-test-user-upload]');
+
+  await triggerUpload(users, input);
+  assert.equal(page.validUploadedUsers().count, 2);
+  await page.confirmUploadedUsers();
+  assert.equal(page.groupsToMatch().count, 1);
+  await page.groupsToMatch(0).chooseGroup('group 1 child 1');
+
+  assert.equal(page.finalData().count, 0);
+
+  assert.equal(page.finalErrorData().count, 2);
+  assert.equal(page.finalErrorData(0).name, 'jasper johnson');
+  assert.equal(page.finalErrorData(0).campusId, '1234567890');
+  assert.equal(page.finalErrorData(0).error, 'Already in the group 1 group. Please remove them in Ilios and try again.');
+  assert.equal(page.finalErrorData(1).name, 'jackson johnson');
+  assert.equal(page.finalErrorData(1).campusId, '12345');
+  assert.equal(page.finalErrorData(1).error, 'Already in the group 1 group. Please remove them in Ilios and try again.');
+
+  assert.notOk(page.canSubmitFinalData);
+
 });

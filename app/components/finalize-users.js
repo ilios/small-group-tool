@@ -1,13 +1,21 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { task } from 'ember-concurrency';
-import { map } from 'rsvp';
+import { filter, map } from 'rsvp';
 
 export default Component.extend({
   users: null,
   matchedGroups: null,
   group: null,
-  finalData: computed('users.[]', 'matchedGroups.[]', function(){
+  invalidUsers: computed('users.[]', 'group', async function () {
+    const users = this.get('users');
+    const group = this.get('group');
+    const allDescendantUsers = await group.get('allDescendantUsers');
+    const allDescendantUserIds = allDescendantUsers.mapBy('id');
+
+    return filter(users, async user => allDescendantUserIds.includes(user.userRecord.get('id')));
+  }),
+  finalData: computed('users.[]', 'matchedGroups.[]', 'group', function(){
     const users = this.get('users');
     const group = this.get('group');
     const matchedGroups = this.get('matchedGroups');

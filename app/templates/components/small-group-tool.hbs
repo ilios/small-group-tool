@@ -1,3 +1,6 @@
+{{#if showSuccessMessage}}
+  <div class='success'>Changes Saved to Ilios!</div>
+{{/if}}
 {{choose-group user=user setGroup=(action (mut group)) group=group}}
 
 {{#if group}}
@@ -14,5 +17,5 @@
 {{/if}}
 
 {{#if (and allUnmatchedGroupsMatched (gt validUsers.length 0))}}
-  {{finalize-users users=validUsers matchedGroups=matchedGroups group=group}}
+  {{finalize-users users=validUsers matchedGroups=matchedGroups group=group success=(perform success)}}
 {{/if}}

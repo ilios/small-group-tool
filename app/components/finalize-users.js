@@ -1,6 +1,6 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { task } from 'ember-concurrency';
+import { task, timeout } from 'ember-concurrency';
 import { filter, map } from 'rsvp';
 
 export default Component.extend({
@@ -37,7 +37,9 @@ export default Component.extend({
   }),
 
   save: task(function* () {
+    yield timeout(250);
     const finalData = this.get('finalData');
+    const success = this.get('success');
     const treeGroups = yield map(finalData, async ({ group, user }) => {
       return group.addUserToGroupAndAllParents(user);
     });
@@ -47,5 +49,6 @@ export default Component.extend({
     }, []);
 
     yield flat.uniq().invoke('save');
-  }),
+    success();
+  }).drop(),
 });

@@ -3,5 +3,12 @@
 
   div {
     padding-bottom: .5em;
+
+    &.success {
+      border: 1px solid $ilios-green;
+      color: $ilios-green;
+      padding: .5em;
+      text-align: center;
+    }
   }
 }

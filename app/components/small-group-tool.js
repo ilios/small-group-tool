@@ -2,14 +2,17 @@ import Component from '@ember/component';
 import EmberObject, { computed } from '@ember/object';
 import { isEmpty, isPresent } from '@ember/utils';
 import { inject as service } from '@ember/service';
+import { task, timeout } from 'ember-concurrency';
 
 export default Component.extend({
   store: service(),
   user: null,
+
   validUsers: null,
   group: null,
-
   matchedGroups: null,
+  showSuccessMessage: false,
+
   classNames: ['small-group-tool'],
 
   unmatchedGroups: computed('validUsers.@each.subGroupName', function () {
@@ -60,6 +63,15 @@ export default Component.extend({
       }
 
       this.set('matchedGroups', matchedGroups);
-    }
+    },
   },
+
+  success: task(function* () {
+    this.set('showSuccessMessage', true);
+    this.set('group', null);
+    this.set('validUsers', null);
+    this.set('matchedGroups', null);
+    yield timeout(5000);
+    this.set('showSuccessMessage', false);
+  }).restartable(),
 });

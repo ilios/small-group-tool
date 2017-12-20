@@ -41,7 +41,11 @@
     </table>
 
     <button {{action (perform save)}} disabled={{save.isRunning}} data-test-finalize-users-submit>
-      Save to Ilios
+      {{#if save.isRunning}}
+        {{fa-icon 'spinner' spin=true}}
+      {{else}}
+        Save to Ilios
+      {{/if}}
     </button>
   {{/if}}
 {{/if}}

@@ -1,3 +1,5 @@
+# This work has been merged into the ilios/frontend and this repository has been archived.
+
 # small-group-tool
 
 This README outlines the details of collaborating on this Ember application.
